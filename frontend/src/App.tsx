@@ -3,11 +3,38 @@ import { useState } from "react"
 function App() {
 
   const [planets, setPlanets] = useState<any>(null)
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
+
+  const getLocation = () => {
+
+  navigator.geolocation.getCurrentPosition(
+
+    (position) => {
+
+      setLatitude(position.coords.latitude)
+
+      setLongitude(position.coords.longitude)
+
+      console.log(position.coords.latitude)
+      console.log(position.coords.longitude)
+    },
+
+    (error) => {
+      console.error(error)
+    }
+  )
+}
 
   const loadPlanets = async () => {
 
+    if (latitude === null || longitude === null) {
+      alert("Please get your location first.")
+      return
+    }
+
     const response = await fetch(
-      "http://127.0.0.1:8000/visible-planets?lat=42.81&lon=-73.94"
+      `http://127.0.0.1:8000/visible-planets?lat=${latitude}&lon=${longitude}`
     )
 
     const data = await response.json()
@@ -31,11 +58,30 @@ function App() {
         </h2>
 
         <button
+          onClick={getLocation}
+          className="bg-green-500 px-4 py-2 rounded-lg mr-4"
+        >
+          Get Location
+        </button>
+
+        <button
           onClick={loadPlanets}
           className="bg-blue-500 px-4 py-2 rounded-lg"
         >
           Load Planets
         </button>
+
+        <div className="mt-4">
+
+          <p>
+            Latitude: {latitude ?? "Unknown"}
+          </p>
+
+          <p>
+            Longitude: {longitude ?? "Unknown"}
+          </p>
+
+        </div>
 
         <div className="mt-6 space-y-4">
 
