@@ -1,8 +1,17 @@
 from fastapi import FastAPI
 from skyfield.api import load, Topos
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Load planetary data
 planets = load('de421.bsp')
