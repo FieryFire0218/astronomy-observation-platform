@@ -1,12 +1,43 @@
 import { useState } from "react"
 
+function getDirection(azimuth: number): string {
+
+  if (azimuth >= 337.5 || azimuth < 22.5)
+    return "North"
+
+  if (azimuth < 67.5)
+    return "Northeast"
+
+  if (azimuth < 112.5)
+    return "East"
+
+  if (azimuth < 157.5)
+    return "Southeast"
+
+  if (azimuth < 202.5)
+    return "South"
+
+  if (azimuth < 247.5)
+    return "Southwest"
+
+  if (azimuth < 292.5)
+    return "West"
+
+  return "Northwest"
+}
+
 function App() {
 
   const [planets, setPlanets] = useState<any>(null)
   const [latitude, setLatitude] = useState<number | null>(null)
   const [longitude, setLongitude] = useState<number | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<string>("")
+  const [loading, setLoading] = useState(false)
+  const [locationLoading, setLocationLoading] = useState(false)
 
   const getLocation = () => {
+
+  setLocationLoading(true)
 
   navigator.geolocation.getCurrentPosition(
 
@@ -16,17 +47,24 @@ function App() {
 
       setLongitude(position.coords.longitude)
 
+      setLocationLoading(false)
+
       console.log(position.coords.latitude)
       console.log(position.coords.longitude)
     },
 
     (error) => {
+
       console.error(error)
+
+      setLocationLoading(false)
     }
   )
 }
 
   const loadPlanets = async () => {
+
+    setLoading(true)
 
     if (latitude === null || longitude === null) {
       alert("Please get your location first.")
@@ -42,6 +80,8 @@ function App() {
     console.log(data)
 
     setPlanets(data)
+    setLastUpdated(new Date().toLocaleString())
+    setLoading(false)
 }
 
   return (
@@ -59,9 +99,12 @@ function App() {
 
         <button
           onClick={getLocation}
+          disabled={locationLoading}
           className="bg-green-500 px-4 py-2 rounded-lg mr-4"
         >
-          Get Location
+          {locationLoading
+            ? "Getting Location..."
+            : "Get Location"}
         </button>
 
         <button
@@ -83,6 +126,22 @@ function App() {
 
         </div>
 
+        <p className="mt-4 text-gray-400">
+          Last Updated: {lastUpdated}
+        </p>
+
+        {loading && (
+          <p className="mt-4">
+            Loading planets...
+          </p>
+        )}
+
+        {locationLoading && (
+          <p className="mt-2 text-gray-400">
+            Requesting location...
+          </p>
+        )}
+
         <div className="mt-6 space-y-4">
 
           {planets &&
@@ -90,23 +149,29 @@ function App() {
 
               <div
                 key={name}
-                className="bg-gray-800 p-4 rounded-lg"
+                className="bg-gray-800 p-4 rounded-xl shadow-lg"
               >
 
                 <h3 className="text-xl font-bold">
                   {name}
                 </h3>
 
-                <p>
-                  Visible: {info.visible ? "Yes" : "No"}
+                <p
+                  className={
+                    info.visible
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }
+                >
+                  {info.visible ? "Visible" : "Below Horizon"}
                 </p>
 
                 <p>
-                  Altitude: {info.altitude}°
+                  Altitude: {info.altitude.toFixed(1)}°
                 </p>
 
                 <p>
-                  Azimuth: {info.azimuth}°
+                  Direction: {getDirection(info.azimuth)}
                 </p>
 
               </div>
