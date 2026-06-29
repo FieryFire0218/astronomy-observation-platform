@@ -1,34 +1,11 @@
 import { useState } from "react"
-
-function getDirection(azimuth: number): string {
-
-  if (azimuth >= 337.5 || azimuth < 22.5)
-    return "North"
-
-  if (azimuth < 67.5)
-    return "Northeast"
-
-  if (azimuth < 112.5)
-    return "East"
-
-  if (azimuth < 157.5)
-    return "Southeast"
-
-  if (azimuth < 202.5)
-    return "South"
-
-  if (azimuth < 247.5)
-    return "Southwest"
-
-  if (azimuth < 292.5)
-    return "West"
-
-  return "Northwest"
-}
+import type { Planet } from "./types/Planet";
+import PlanetCard from "./components/PlanetCard";
+import { getVisiblePlanets } from "./services/astronomyApi";
 
 function App() {
 
-  const [planets, setPlanets] = useState<any>(null)
+  const [planets, setPlanets] = useState<Record<string, Planet> | null>(null);
   const [latitude, setLatitude] = useState<number | null>(null)
   const [longitude, setLongitude] = useState<number | null>(null)
   const [lastUpdated, setLastUpdated] = useState<string>("")
@@ -71,11 +48,7 @@ function App() {
       return
     }
 
-    const response = await fetch(
-      `http://127.0.0.1:8000/visible-planets?lat=${latitude}&lon=${longitude}`
-    )
-
-    const data = await response.json()
+    const data = await getVisiblePlanets(latitude, longitude);
 
     console.log(data)
 
@@ -145,36 +118,13 @@ function App() {
         <div className="mt-6 space-y-4">
 
           {planets &&
-            Object.entries(planets).map(([name, info]: any) => (
+            Object.entries(planets).map(([name, planet]: [string, Planet]) => (
 
-              <div
-                key={name}
-                className="bg-gray-800 p-4 rounded-xl shadow-lg"
-              >
-
-                <h3 className="text-xl font-bold">
-                  {name}
-                </h3>
-
-                <p
-                  className={
-                    info.visible
-                      ? "text-green-400"
-                      : "text-red-400"
-                  }
-                >
-                  {info.visible ? "Visible" : "Below Horizon"}
-                </p>
-
-                <p>
-                  Altitude: {info.altitude.toFixed(1)}°
-                </p>
-
-                <p>
-                  Direction: {getDirection(info.azimuth)}
-                </p>
-
-              </div>
+              <PlanetCard
+                  key={name}
+                  name={name}
+                  planet={planet}
+              />
 
             ))
           }
