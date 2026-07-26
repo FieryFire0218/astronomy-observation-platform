@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from skyfield.api import load, Topos
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 
 app = FastAPI()
 
@@ -68,3 +69,23 @@ def visible_planets(lat: float, lon: float):
         }
 
     return results
+
+@app.get("/weather")
+def get_weather(lat: float, lon: float): 
+    url = (
+    "https://api.open-meteo.com/v1/forecast"
+    f"?latitude={lat}"
+    f"&longitude={lon}"
+    "&current=temperature_2m,cloud_cover,wind_speed_10m"
+    )
+
+    response = requests.get(url)
+    data = response.json()
+
+    current = data["current"]
+
+    return {
+        "temperature": current["temperature_2m"],
+        "cloud_cover": current["cloud_cover"],
+        "wind_speed": current["wind_speed_10m"]
+    }

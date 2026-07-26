@@ -1,7 +1,9 @@
 import { useState } from "react"
 import type { Planet } from "./types/Planet";
 import PlanetCard from "./components/PlanetCard";
-import { getVisiblePlanets } from "./services/astronomyApi";
+import { getVisiblePlanets, getWeather } from "./services/astronomyApi";
+import type { Weather } from "./types/Weather";
+import WeatherCard from "./components/WeatherCard";
 
 function App() {
 
@@ -11,6 +13,7 @@ function App() {
   const [lastUpdated, setLastUpdated] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [locationLoading, setLocationLoading] = useState(false)
+  const [weather, setWeather] = useState<Weather | null>(null);
 
   const getLocation = () => {
 
@@ -45,14 +48,19 @@ function App() {
 
     if (latitude === null || longitude === null) {
       alert("Please get your location first.")
+      setLoading(false)
       return
     }
 
     const data = await getVisiblePlanets(latitude, longitude);
+    const weatherData = await getWeather(latitude, longitude);
+
 
     console.log(data)
+    console.log(weatherData)
 
     setPlanets(data)
+    setWeather(weatherData);
     setLastUpdated(new Date().toLocaleString())
     setLoading(false)
 }
@@ -98,6 +106,10 @@ function App() {
           </p>
 
         </div>
+
+        {weather && (
+          <WeatherCard weather={weather} />
+        )}
 
         <p className="mt-4 text-gray-400">
           Last Updated: {lastUpdated}
