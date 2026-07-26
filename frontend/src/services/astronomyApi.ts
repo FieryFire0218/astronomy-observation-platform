@@ -1,3 +1,6 @@
+import type { Weather } from "../types/Weather";
+import type { Sun } from "../types/Sun";
+
 export async function getVisiblePlanets(
     latitude: number,
     longitude: number
@@ -14,8 +17,6 @@ export async function getVisiblePlanets(
     return await response.json();
 }
 
-import type { Weather } from "../types/Weather";
-
 export async function getWeather(
     latitude: number,
     longitude: number
@@ -27,6 +28,22 @@ export async function getWeather(
 
     if (!response.ok) {
         throw new Error("Failed to load weather.");
+    }
+
+    return await response.json();
+}
+
+export async function getSun(
+    latitude: number,
+    longitude: number
+): Promise<Sun> {
+
+    const response = await fetch(
+        `http://127.0.0.1:8000/sun?lat=${latitude}&lon=${longitude}`
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to load sun data.");
     }
 
     return await response.json();

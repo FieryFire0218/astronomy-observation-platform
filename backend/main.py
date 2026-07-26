@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from skyfield.api import load, Topos
 from datetime import datetime
+from datetime import date
 from fastapi.middleware.cors import CORSMiddleware
 import requests
+from astral import LocationInfo
+from astral.sun import sun, dawn, dusk
+from astral import SunDirection
+from zoneinfo import ZoneInfo
 
 app = FastAPI()
 
@@ -88,4 +93,49 @@ def get_weather(lat: float, lon: float):
         "temperature": current["temperature_2m"],
         "cloud_cover": current["cloud_cover"],
         "wind_speed": current["wind_speed_10m"]
+    }
+
+@app.get("/sun")
+def get_sun(lat: float, lon: float):
+
+    timezone = ZoneInfo("America/New_York")
+
+    location = LocationInfo(
+        latitude=lat,
+        longitude=lon
+    )
+
+    sun_times = sun(
+        location.observer,
+        date=date.today(),
+        tzinfo=timezone
+    )
+
+    civil_dusk = dusk(
+    location.observer,
+    date=date.today(),
+    tzinfo=timezone,
+    depression=6
+    )
+
+    nautical_dusk = dusk(
+        location.observer,
+        date=date.today(),
+        tzinfo=timezone,
+        depression=12
+    )
+
+    astronomical_dusk = dusk(
+        location.observer,
+        date=date.today(),
+        tzinfo=timezone,
+        depression=18
+    )
+
+    return {
+        "sunrise": sun_times["sunrise"].strftime("%I:%M %p %Z"),
+        "sunset": sun_times["sunset"].strftime("%I:%M %p %Z"),
+        "civil_dusk": civil_dusk.strftime("%I:%M %p %Z"),
+        "nautical_dusk": nautical_dusk.strftime("%I:%M %p %Z"),
+        "astronomical_dusk": astronomical_dusk.strftime("%I:%M %p %Z")
     }

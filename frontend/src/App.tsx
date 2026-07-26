@@ -1,9 +1,15 @@
 import { useState } from "react"
 import type { Planet } from "./types/Planet";
 import PlanetCard from "./components/PlanetCard";
-import { getVisiblePlanets, getWeather } from "./services/astronomyApi";
+import {
+    getVisiblePlanets,
+    getWeather,
+    getSun
+} from "./services/astronomyApi";
 import type { Weather } from "./types/Weather";
 import WeatherCard from "./components/WeatherCard";
+import type { Sun } from "./types/Sun";
+import SunCard from "./components/SunCard";
 
 function App() {
 
@@ -14,6 +20,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [locationLoading, setLocationLoading] = useState(false)
   const [weather, setWeather] = useState<Weather | null>(null);
+  const [sun, setSun] = useState<Sun | null>(null);
 
   const getLocation = () => {
 
@@ -54,13 +61,16 @@ function App() {
 
     const data = await getVisiblePlanets(latitude, longitude);
     const weatherData = await getWeather(latitude, longitude);
+    const sunData = await getSun(latitude, longitude);
 
 
     console.log(data)
     console.log(weatherData)
+    console.log(sunData)
 
     setPlanets(data)
     setWeather(weatherData);
+    setSun(sunData);
     setLastUpdated(new Date().toLocaleString())
     setLoading(false)
 }
@@ -107,13 +117,17 @@ function App() {
 
         </div>
 
+        <p className="mt-4 text-gray-400">
+          Last Updated: {lastUpdated}
+        </p>
+
         {weather && (
           <WeatherCard weather={weather} />
         )}
 
-        <p className="mt-4 text-gray-400">
-          Last Updated: {lastUpdated}
-        </p>
+        {sun && (
+            <SunCard sun={sun} />
+        )}
 
         {loading && (
           <p className="mt-4">
