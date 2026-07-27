@@ -1,5 +1,6 @@
 import type { Weather } from "../types/Weather";
 import type { Sun } from "../types/Sun";
+import type { ObservationScore } from "../types/ObservationScore";
 
 export async function getVisiblePlanets(
     latitude: number,
@@ -44,6 +45,22 @@ export async function getSun(
 
     if (!response.ok) {
         throw new Error("Failed to load sun data.");
+    }
+
+    return await response.json();
+}
+
+export async function getObservationScore(
+    latitude: number,
+    longitude: number
+): Promise<ObservationScore> {
+
+    const response = await fetch(
+        `http://127.0.0.1:8000/observation-score?lat=${latitude}&lon=${longitude}`
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to load observation score.");
     }
 
     return await response.json();

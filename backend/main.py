@@ -9,6 +9,11 @@ from astral.sun import sun, dawn, dusk
 from astral import SunDirection
 from zoneinfo import ZoneInfo
 
+CLOUD_PENALTY = 0.6
+HIGH_WIND_SPEED = 15
+VERY_HIGH_WIND_SPEED = 30
+PLANET_BONUS = 2
+
 app = FastAPI()
 
 app.add_middleware(
@@ -138,4 +143,63 @@ def get_sun(lat: float, lon: float):
         "civil_dusk": civil_dusk.strftime("%I:%M %p %Z"),
         "nautical_dusk": nautical_dusk.strftime("%I:%M %p %Z"),
         "astronomical_dusk": astronomical_dusk.strftime("%I:%M %p %Z")
+    }
+
+@app.get("/observation-score")
+def get_observation_score(
+    lat: float,
+    lon: float
+):
+    score = 100
+
+    weather = get_weather(lat, lon)
+
+    cloud_cover = weather["cloud_cover"]
+    score -= cloud_cover * CLOUD_PENALTY
+
+    wind = weather["wind_speed"]
+    if wind > HIGH_WIND_SPEED:
+        score -= 10
+    if wind > VERY_HIGH_WIND_SPEED:
+        score -= 15
+
+    planets = visible_planets(lat, lon)
+    visible = 0
+
+    for planet in planets.values():
+        if planet["visible"]:
+            visible += 1
+
+    score += visible * PLANET_BONUS
+
+    score = max(0, min(100, round(score)))
+
+    # ratings
+    if score >= 90:
+        rating = "Excellent"
+
+    elif score >= 75:
+        rating = "Very Good"
+
+    elif score >= 60:
+        rating = "Good"
+
+    elif score >= 40:
+        rating = "Fair"
+
+    else:
+        rating = "Poor"
+
+    return {
+
+        "score": score,
+
+        "rating": rating,
+
+        "cloud_cover": cloud_cover,
+
+        "wind_speed": wind,
+
+        "visible_planets": visible
+
     }
