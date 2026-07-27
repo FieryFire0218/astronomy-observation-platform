@@ -4,7 +4,7 @@ backend:
 
 venv\Scripts\activate
 
-uvicorn mani:app --reload
+uvicorn main:app --reload
 
 frontend:
 npm run dev
