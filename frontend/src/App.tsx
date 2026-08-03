@@ -92,90 +92,145 @@ function App() {
 }
 
   return (
-    <div className="min-h-screen bg-black text-white p-8">
+    <div className="min-h-screen bg-black text-white">
 
-      <h1 className="text-4xl font-bold mb-6">
-        Astronomy Observation Platform
-      </h1>
+      <div className="max-w-7xl mx-auto p-8">
 
-      <div className="bg-gray-900 p-6 rounded-xl w-full max-w-md">
+        {/* ---------- Header ---------- */}
 
-        <h2 className="text-2xl mb-4">
-          Visible Planets
-        </h2>
+        <h1 className="text-5xl font-bold mb-2">
+          Astronomy Observation Platform
+        </h1>
 
-        <button
-          onClick={getLocation}
-          disabled={locationLoading}
-          className="bg-green-500 px-4 py-2 rounded-lg mr-4"
-        >
-          {locationLoading
-            ? "Getting Location..."
-            : "Get Location"}
-        </button>
+        <p className="text-gray-400 mb-8">
+          View current observing conditions based on your location.
+        </p>
 
-        <button
-          onClick={loadPlanets}
-          className="bg-blue-500 px-4 py-2 rounded-lg"
-        >
-          Load Planets
-        </button>
+        {/* ---------- Location Card ---------- */}
 
-        <div className="mt-4">
+        <div className="bg-gray-900 rounded-xl p-6 mb-8">
 
-          <p>
-            Latitude: {latitude ?? "Unknown"}
+          <h2 className="text-2xl font-bold mb-4">
+            Current Location
+          </h2>
+
+          <div className="flex gap-4 flex-wrap mb-6">
+
+            <button
+              onClick={getLocation}
+              disabled={locationLoading}
+              className="bg-green-500 px-4 py-2 rounded-lg"
+            >
+              {locationLoading
+                ? "Getting Location..."
+                : "Get Location"}
+            </button>
+
+            <button
+              onClick={loadPlanets}
+              className="bg-blue-500 px-4 py-2 rounded-lg"
+            >
+              Load Observation Data
+            </button>
+
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <div>
+
+              <p className="text-gray-400">
+                Latitude
+              </p>
+
+              <p>
+                {latitude ?? "Unknown"}
+              </p>
+
+            </div>
+
+            <div>
+
+              <p className="text-gray-400">
+                Longitude
+              </p>
+
+              <p>
+                {longitude ?? "Unknown"}
+              </p>
+
+            </div>
+
+          </div>
+
+          <p className="mt-4 text-gray-400">
+            Last Updated: {lastUpdated}
           </p>
 
-          <p>
-            Longitude: {longitude ?? "Unknown"}
-          </p>
+          {loading && (
+            <p className="mt-4">
+              Loading astronomy data...
+            </p>
+          )}
+
+          {locationLoading && (
+            <p className="mt-2 text-gray-400">
+              Requesting location...
+            </p>
+          )}
 
         </div>
 
-        <p className="mt-4 text-gray-400">
-          Last Updated: {lastUpdated}
-        </p>
+        {/* ---------- Dashboard ---------- */}
 
-        {observationScore && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {observationScore && (
             <ObservationScoreCard
-                observationScore={observationScore}
+              observationScore={observationScore}
             />
-        )}
+          )}
 
-        {weather && (
-          <WeatherCard weather={weather} />
-        )}
+          {sun && (
+            <SunCard
+              sun={sun}
+            />
+          )}
 
-        {sun && (
-            <SunCard sun={sun} />
-        )}
+          {weather && (
+            <WeatherCard
+              weather={weather}
+            />
+          )}
 
-        {loading && (
-          <p className="mt-4">
-            Loading planets...
-          </p>
-        )}
+          {/* SkyMap will go here later */}
 
-        {locationLoading && (
-          <p className="mt-2 text-gray-400">
-            Requesting location...
-          </p>
-        )}
+        </div>
 
-        <div className="mt-6 space-y-4">
+        {/* ---------- Planets ---------- */}
 
-          {planets &&
-            Object.entries(planets).map(([name, planet]: [string, Planet]) => (
+        <div className="mt-10">
 
-              <PlanetCard
-                  key={name}
-                  name={name}
-                  planet={planet}
-              />
+          <h2 className="text-3xl font-bold mb-6">
+            Visible Planets
+          </h2>
 
-            ))
-          }
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+
+            {planets &&
+              Object.entries(planets).map(
+                ([name, planet]: [string, Planet]) => (
+
+                  <PlanetCard
+                    key={name}
+                    name={name}
+                    planet={planet}
+                  />
+
+                )
+              )}
+
+          </div>
 
         </div>
 
