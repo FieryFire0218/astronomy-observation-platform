@@ -63,23 +63,32 @@ function App() {
       return
     }
 
-    const data = await getVisiblePlanets(latitude, longitude);
-    const weatherData = await getWeather(latitude, longitude);
-    const sunData = await getSun(latitude, longitude);
-    const observationData = await getObservationScore(latitude, longitude);
+    try {
+      const [
+          planetData,
+          weatherData,
+          sunData,
+          observationData
+      ] = await Promise.all([
+          getVisiblePlanets(latitude, longitude),
+          getWeather(latitude, longitude),
+          getSun(latitude, longitude),
+          getObservationScore(latitude, longitude)
+      ]);
 
+      setPlanets(planetData)
+      setWeather(weatherData);
+      setSun(sunData);
+      setObservationScore(observationData);
+      setLastUpdated(new Date().toLocaleString())
 
-    console.log(data)
-    console.log(weatherData)
-    console.log(sunData)
-    console.log(observationData)
+    } catch (error) {
+      console.error(error);
+      alert("Failed to load astronomy data.");
 
-    setPlanets(data)
-    setWeather(weatherData);
-    setSun(sunData);
-    setObservationScore(observationData);
-    setLastUpdated(new Date().toLocaleString())
-    setLoading(false)
+    } finally {
+      setLoading(false)
+    }
 }
 
   return (
