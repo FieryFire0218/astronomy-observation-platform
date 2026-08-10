@@ -13,6 +13,7 @@ import type { Sun } from "./types/Sun";
 import SunCard from "./components/SunCard";
 import type { ObservationScore } from "./types/ObservationScore";
 import ObservationScoreCard from "./components/ObservationScoreCard";
+import SkyMap from "./components/SkyMap";
 
 function App() {
 
@@ -189,6 +190,12 @@ function App() {
             <ObservationScoreCard
               observationScore={observationScore}
             />
+          )}
+
+          {planets && (
+              <SkyMap 
+                planets={planets} 
+              />
           )}
 
           {sun && (
