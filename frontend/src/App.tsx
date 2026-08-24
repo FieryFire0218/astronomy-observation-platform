@@ -39,10 +39,13 @@ function setObservationNow(
 
 function setObservationTimeToHour(
     hour: number,
+    observationTime: string,
     setObservationTime: Dispatch<SetStateAction<string>>
 ) {
 
-    const date = new Date();
+    const date = observationTime
+        ? new Date(observationTime)
+        : new Date();
 
     date.setHours(hour);
     date.setMinutes(0);
@@ -58,37 +61,34 @@ function setObservationToSunTime(
     sunTime: string,
     setObservationTime: Dispatch<SetStateAction<string>>
 ) {
-
-    const now = new Date();
-
-    const match = sunTime.match(
-        /(\d+):(\d+)\s+(AM|PM)/
-    );
-
-    if (!match) {
-        console.error("Invalid sun time:", sunTime);
-        return;
-    }
-
-    let hours = Number(match[1]);
-    const minutes = Number(match[2]);
-    const period = match[3];
-
-    if (period === "PM" && hours !== 12) {
-        hours += 12;
-    }
-
-    if (period === "AM" && hours === 12) {
-        hours = 0;
-    }
-
-    now.setHours(hours);
-    now.setMinutes(minutes);
-    now.setSeconds(0);
-    now.setMilliseconds(0);
+    const date = new Date(sunTime);
 
     setObservationTime(
-        formatDateTimeLocal(now)
+        formatDateTimeLocal(date)
+    );
+}
+
+function setObservationToMidnight(
+    observationTime: string,
+    setObservationTime: Dispatch<SetStateAction<string>>
+) {
+    const date = observationTime
+        ? new Date(observationTime)
+        : new Date();
+
+    const currentHour = date.getHours();
+
+    if (currentHour !== 0 || date.getMinutes() !== 0) {
+        date.setDate(date.getDate() + 1);
+    }
+
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    setObservationTime(
+        formatDateTimeLocal(date)
     );
 }
 
@@ -149,10 +149,33 @@ function App() {
           sunData,
           observationData
       ] = await Promise.all([
-          getVisiblePlanets(latitude, longitude, observationTime),
-          getWeather(latitude, longitude),
-          getSun(latitude, longitude),
-          getObservationScore(latitude, longitude)
+
+          getVisiblePlanets(
+              latitude,
+              longitude,
+              observationTime
+          ),
+
+          getWeather(
+              latitude,
+              longitude,
+              observationTime
+          ),
+
+          getSun(
+              latitude,
+              longitude,
+              observationTime
+                  ? observationTime.split("T")[0]
+                  : undefined
+          ),
+
+          getObservationScore(
+              latitude,
+              longitude,
+              observationTime
+          )
+
       ]);
 
       setPlanets(planetData)
@@ -222,6 +245,7 @@ function App() {
                         onClick={() =>
                             setObservationTimeToHour(
                                 21,
+                                observationTime,
                                 setObservationTime
                             )
                         }
@@ -232,8 +256,8 @@ function App() {
 
                     <button
                         onClick={() =>
-                            setObservationTimeToHour(
-                                0,
+                            setObservationToMidnight(
+                                observationTime,
                                 setObservationTime
                             )
                         }
@@ -246,7 +270,7 @@ function App() {
                         onClick={() =>
                             sun &&
                             setObservationToSunTime(
-                                sun.sunset,
+                                sun.sunset_datetime,
                                 setObservationTime
                             )
                         }
@@ -260,7 +284,7 @@ function App() {
                         onClick={() =>
                             sun &&
                             setObservationToSunTime(
-                                sun.sunrise,
+                                sun.sunrise_datetime,
                                 setObservationTime
                             )
                         }

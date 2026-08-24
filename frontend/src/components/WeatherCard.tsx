@@ -10,7 +10,7 @@ function WeatherCard({ weather }: WeatherCardProps) {
             <div className="bg-gray-800 p-4 rounded-xl shadow-lg mt-6">
 
             <h2 className="text-2xl font-bold mb-4">
-                Current Weather
+                🌤 Weather Conditions
             </h2>
 
             <p>
