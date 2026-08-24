@@ -49,9 +49,20 @@ def root():
 
 
 @app.get("/visible-planets")
-def visible_planets(lat: float, lon: float):
+def visible_planets(lat: float, lon: float, datetime_str: str | None = None):
 
-    t = ts.now()
+    if datetime_str:
+        dt = datetime.fromisoformat(datetime_str)
+
+        if dt.tzinfo is None:
+            dt = dt.replace(
+                tzinfo=ZoneInfo("America/New_York")
+            )
+
+        t = ts.from_datetime(dt)
+
+    else:
+        t = ts.now()
 
     observer = earth + Topos(
         latitude_degrees=lat,

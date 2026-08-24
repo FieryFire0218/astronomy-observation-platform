@@ -1,4 +1,5 @@
 import { useState } from "react"
+import type { Dispatch, SetStateAction } from "react"
 import type { Planet } from "./types/Planet";
 import PlanetCard from "./components/PlanetCard";
 import {
@@ -15,6 +16,82 @@ import type { ObservationScore } from "./types/ObservationScore";
 import ObservationScoreCard from "./components/ObservationScoreCard";
 import SkyMap from "./components/SkyMap";
 
+function formatDateTimeLocal(date: Date): string {
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+function setObservationNow(
+    setObservationTime: Dispatch<SetStateAction<string>>
+) {
+
+    setObservationTime(
+        formatDateTimeLocal(new Date())
+    );
+}
+
+function setObservationTimeToHour(
+    hour: number,
+    setObservationTime: Dispatch<SetStateAction<string>>
+) {
+
+    const date = new Date();
+
+    date.setHours(hour);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
+
+    setObservationTime(
+        formatDateTimeLocal(date)
+    );
+}
+
+function setObservationToSunTime(
+    sunTime: string,
+    setObservationTime: Dispatch<SetStateAction<string>>
+) {
+
+    const now = new Date();
+
+    const match = sunTime.match(
+        /(\d+):(\d+)\s+(AM|PM)/
+    );
+
+    if (!match) {
+        console.error("Invalid sun time:", sunTime);
+        return;
+    }
+
+    let hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    const period = match[3];
+
+    if (period === "PM" && hours !== 12) {
+        hours += 12;
+    }
+
+    if (period === "AM" && hours === 12) {
+        hours = 0;
+    }
+
+    now.setHours(hours);
+    now.setMinutes(minutes);
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+
+    setObservationTime(
+        formatDateTimeLocal(now)
+    );
+}
+
 function App() {
 
   const [planets, setPlanets] = useState<Record<string, Planet> | null>(null);
@@ -26,6 +103,7 @@ function App() {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [sun, setSun] = useState<Sun | null>(null);
   const [observationScore, setObservationScore] = useState<ObservationScore | null>(null);
+  const [observationTime, setObservationTime] = useState("");
 
   const getLocation = () => {
 
@@ -71,7 +149,7 @@ function App() {
           sunData,
           observationData
       ] = await Promise.all([
-          getVisiblePlanets(latitude, longitude),
+          getVisiblePlanets(latitude, longitude, observationTime),
           getWeather(latitude, longitude),
           getSun(latitude, longitude),
           getObservationScore(latitude, longitude)
@@ -116,6 +194,92 @@ function App() {
           </h2>
 
           <div className="flex gap-4 flex-wrap mb-6">
+            <div className="mb-4">
+
+                <label className="block text-sm text-gray-400 mb-2">
+                    Observation Time
+                </label>
+
+                <input
+                    type="datetime-local"
+                    value={observationTime}
+                    onChange={(e) => setObservationTime(e.target.value)}
+                    className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white"
+                />
+
+                <div className="flex flex-wrap gap-2 mt-3">
+
+                    <button
+                        onClick={() =>
+                            setObservationNow(setObservationTime)
+                        }
+                        className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm"
+                    >
+                        Now
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setObservationTimeToHour(
+                                21,
+                                setObservationTime
+                            )
+                        }
+                        className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm"
+                    >
+                        9 PM
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            setObservationTimeToHour(
+                                0,
+                                setObservationTime
+                            )
+                        }
+                        className="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-sm"
+                    >
+                        Midnight
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            sun &&
+                            setObservationToSunTime(
+                                sun.sunset,
+                                setObservationTime
+                            )
+                        }
+                        disabled={!sun}
+                        className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 px-3 py-2 rounded-lg text-sm"
+                    >
+                        Sunset
+                    </button>
+
+                    <button
+                        onClick={() =>
+                            sun &&
+                            setObservationToSunTime(
+                                sun.sunrise,
+                                setObservationTime
+                            )
+                        }
+                        disabled={!sun}
+                        className="bg-gray-700 hover:bg-gray-600 disabled:opacity-40 px-3 py-2 rounded-lg text-sm"
+                    >
+                        Sunrise
+                    </button>
+
+                </div>
+
+                {observationTime && (
+                    <p className="text-sm text-gray-400 mt-2">
+                        Showing sky for{" "}
+                        {new Date(observationTime).toLocaleString()}
+                    </p>
+                )}
+
+            </div>
 
             <button
               onClick={getLocation}
@@ -195,6 +359,7 @@ function App() {
           {planets && (
               <SkyMap 
                 planets={planets} 
+                observationTime={observationTime}
               />
           )}
 

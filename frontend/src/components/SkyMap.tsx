@@ -2,6 +2,7 @@ import type { Planet } from "../types/Planet";
 
 interface SkyMapProps {
     planets: Record<string, Planet>;
+    observationTime: string;
 }
 
 function getPlanetPosition(
@@ -103,7 +104,7 @@ function getDirection(azimuth: number): string {
     return "Northwest";
 }
 
-function SkyMap({ planets }: SkyMapProps) {
+function SkyMap({ planets, observationTime }: SkyMapProps) {
 
     return (
         <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
@@ -111,6 +112,13 @@ function SkyMap({ planets }: SkyMapProps) {
             <h2 className="text-2xl font-bold mb-4">
                 🌌 Sky Map
             </h2>
+
+            <p className="text-sm text-gray-400 mb-4">
+                {observationTime
+                    ? `Viewing sky for ${new Date(observationTime).toLocaleString()}`
+                    : "Viewing sky for current time"
+                }
+            </p>
 
             <div className="relative w-full max-w-[500px] aspect-square mx-auto rounded-full border-2 border-gray-500">
 

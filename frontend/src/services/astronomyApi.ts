@@ -4,12 +4,22 @@ import type { ObservationScore } from "../types/ObservationScore";
 
 export async function getVisiblePlanets(
     latitude: number,
-    longitude: number
+    longitude: number,
+    observationTime?: string
 ) {
 
-    const response = await fetch(
-        `http://127.0.0.1:8000/visible-planets?lat=${latitude}&lon=${longitude}`
+    const url = new URL(
+        "http://127.0.0.1:8000/visible-planets"
     );
+
+    url.searchParams.set("lat", latitude.toString());
+    url.searchParams.set("lon", longitude.toString());
+
+    if (observationTime) {
+        url.searchParams.set("datetime_str", observationTime);
+    }
+
+    const response = await fetch(url);
 
     if (!response.ok) {
         throw new Error("Failed to load planets.");
