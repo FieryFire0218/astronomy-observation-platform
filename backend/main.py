@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from skyfield.api import load, Topos
 from datetime import datetime
@@ -16,10 +17,19 @@ PLANET_BONUS = 2
 
 app = FastAPI()
 
+frontend_url = os.getenv("FRONTEND_URL", "").rstrip("/")
+
+allowed_origins = [
+    "http://localhost:5173"
+]
+
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

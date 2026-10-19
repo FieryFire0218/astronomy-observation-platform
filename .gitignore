@@ -3,18 +3,24 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Virtual environments
 venv/
-.env/
+.venv/
+env/
 
 # Environment variables
 .env
+.env.*
+!.env.example
 
 # macOS
 .DS_Store
 
-# VSCode
+# VS Code
 .vscode/
 
 # Node modules
@@ -23,8 +29,49 @@ node_modules/
 # Build folders
 dist/
 build/
+*.egg-info/
 
 # Logs
 *.log
 
-de421.bsp
+# Local Skyfield ephemeris files
+*.bsp
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# Node modules
+node_modules/
+
+# Build folders
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+
+# Local Skyfield ephemeris files
+*.bsp

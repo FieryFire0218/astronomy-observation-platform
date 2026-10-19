@@ -2,15 +2,16 @@ import type { Weather } from "../types/Weather";
 import type { Sun } from "../types/Sun";
 import type { ObservationScore } from "../types/ObservationScore";
 
+const API_BASE_URL = (
+    import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
+).replace(/\/$/, "");
+
 export async function getVisiblePlanets(
     latitude: number,
     longitude: number,
     observationTime?: string
 ) {
-
-    const url = new URL(
-        "http://127.0.0.1:8000/visible-planets"
-    );
+    const url = new URL(`${API_BASE_URL}/visible-planets`);
 
     url.searchParams.set("lat", latitude.toString());
     url.searchParams.set("lon", longitude.toString());
@@ -33,26 +34,13 @@ export async function getWeather(
     longitude: number,
     observationTime?: string
 ): Promise<Weather> {
+    const url = new URL(`${API_BASE_URL}/weather`);
 
-    const url = new URL(
-        "http://127.0.0.1:8000/weather"
-    );
-
-    url.searchParams.set(
-        "lat",
-        latitude.toString()
-    );
-
-    url.searchParams.set(
-        "lon",
-        longitude.toString()
-    );
+    url.searchParams.set("lat", latitude.toString());
+    url.searchParams.set("lon", longitude.toString());
 
     if (observationTime) {
-        url.searchParams.set(
-            "datetime_str",
-            observationTime
-        );
+        url.searchParams.set("datetime_str", observationTime);
     }
 
     const response = await fetch(url);
@@ -67,28 +55,15 @@ export async function getWeather(
 export async function getSun(
     latitude: number,
     longitude: number,
-    observationDate?: string
+    observationTime?: string
 ): Promise<Sun> {
+    const url = new URL(`${API_BASE_URL}/sun`);
 
-    const url = new URL(
-        "http://127.0.0.1:8000/sun"
-    );
+    url.searchParams.set("lat", latitude.toString());
+    url.searchParams.set("lon", longitude.toString());
 
-    url.searchParams.set(
-        "lat",
-        latitude.toString()
-    );
-
-    url.searchParams.set(
-        "lon",
-        longitude.toString()
-    );
-
-    if (observationDate) {
-        url.searchParams.set(
-            "date_str",
-            observationDate
-        );
+    if (observationTime) {
+        url.searchParams.set("datetime_str", observationTime);
     }
 
     const response = await fetch(url);
@@ -105,26 +80,13 @@ export async function getObservationScore(
     longitude: number,
     observationTime?: string
 ): Promise<ObservationScore> {
+    const url = new URL(`${API_BASE_URL}/observation-score`);
 
-    const url = new URL(
-        "http://127.0.0.1:8000/observation-score"
-    );
-
-    url.searchParams.set(
-        "lat",
-        latitude.toString()
-    );
-
-    url.searchParams.set(
-        "lon",
-        longitude.toString()
-    );
+    url.searchParams.set("lat", latitude.toString());
+    url.searchParams.set("lon", longitude.toString());
 
     if (observationTime) {
-        url.searchParams.set(
-            "datetime_str",
-            observationTime
-        );
+        url.searchParams.set("datetime_str", observationTime);
     }
 
     const response = await fetch(url);
