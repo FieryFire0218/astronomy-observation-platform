@@ -1,8 +1,17 @@
 # Astronomy Observation Platform
 
+**[Live Demo](https://astronomy-observation-platform.vercel.app/)**
+
 A full-stack astronomy dashboard that helps observers understand what can be seen from their location at a selected date and time.
 
 The platform combines browser geolocation, planetary calculations, weather data, solar information, observation-quality scoring, and an interactive sky map in a responsive React dashboard.
+
+
+## Screenshots
+
+### Observation Dashboard
+
+![Astronomy Observation Dashboard](screenshots/dashboard.png)
 
 ## Features
 
@@ -15,7 +24,7 @@ The platform combines browser geolocation, planetary calculations, weather data,
 
 ### Planet visibility
 
-The FastAPI backend uses Skyfield and the bundled `backend/de421.bsp` ephemeris to calculate the apparent position of the Moon and major planets. Each object includes:
+The FastAPI backend uses Skyfield and the `backend/de421.bsp` ephemeris, which is downloaded during setup, to calculate the apparent position of the Moon and major planets. Each object includes:
 
 - Altitude above the horizon
 - Azimuth
@@ -67,6 +76,19 @@ FastAPI backend
 
 The frontend loads the independent astronomy, weather, solar, and scoring requests concurrently when refreshing the dashboard.
 
+
+## Deployment
+
+The application is publicly deployed using:
+
+- **Vercel:** React and TypeScript frontend
+- **Render:** FastAPI backend
+
+**Live Application:** https://astronomy-observation-platform.vercel.app/
+
+The frontend communicates with the backend through RESTful API endpoints over HTTPS.
+
+
 ## Tech stack
 
 ### Frontend
@@ -78,7 +100,7 @@ The frontend loads the independent astronomy, weather, solar, and scoring reques
 
 ### Backend
 
-- Python 3.10+
+- Python 3.14.5
 - FastAPI
 - Uvicorn
 - Skyfield
@@ -126,9 +148,20 @@ astronomy-observation-platform/
 
 ### Prerequisites
 
-- Python 3.10 or newer
+- Python 3.14.5
 - Node.js and npm
 - Git
+
+### Environment Configuration
+
+The frontend uses the `VITE_API_BASE_URL` environment variable to communicate with the deployed FastAPI backend.
+
+When the variable is not set, the frontend defaults to `http://127.0.0.1:8000` for local development.
+
+In production, this variable is configured through Vercel's environment settings.
+
+The backend uses `FRONTEND_URL` to allow requests from the deployed frontend through CORS.
+
 
 ### 1. Start the backend
 
@@ -142,7 +175,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
-The API runs at `http://127.0.0.1:8000`. Interactive API documentation is available at `http://127.0.0.1:8000/docs`.
+The API runs at `https://astronomy-platform-api.onrender.com`. Interactive API documentation is available at `https://astronomy-platform-api.onrender.com/docs`.
 
 If PowerShell blocks script activation, activate the environment from Command Prompt instead:
 
@@ -160,7 +193,7 @@ npm install
 npm run dev
 ```
 
-The frontend is typically available at `http://localhost:5173`.
+The frontend is typically available at `https://astronomy-observation-platform.vercel.app`.
 
 ## API endpoints
 
@@ -177,10 +210,10 @@ All calculation endpoints accept `lat` and `lon`. Time-dependent endpoints optio
 Example:
 
 ```text
-GET http://127.0.0.1:8000/visible-planets?lat=42.81&lon=-73.94&datetime_str=2026-08-24T21:00
+GET https://astronomy-platform-api.onrender.com/visible-planets?lat=42.81&lon=-73.94&datetime_str=2026-08-24T21:00
 ```
 
-The backend enables CORS for the Vite development origin `http://localhost:5173`.
+The backend enables CORS for the Vite development origin `https://astronomy-observation-platform.vercel.app`.
 
 ## Privacy
 
@@ -199,7 +232,6 @@ npm run preview   # Preview the production build locally
 
 ## Future improvements
 
-- Deploy the frontend and backend
 - Add searchable and favorite locations
 - Refresh the browser location automatically
 - Add constellation overlays and a star catalog
