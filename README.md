@@ -195,6 +195,32 @@ npm run dev
 
 The frontend is typically available at `https://astronomy-observation-platform.vercel.app`.
 
+
+## Testing
+
+The backend includes automated tests using pytest and FastAPI's TestClient.
+
+The test suite covers:
+
+- API health checks and input validation
+- Weather data selection with mocked API responses
+- Planetary altitude, azimuth, and visibility
+- Sunrise/sunset calculations and midnight rollover
+- EST/EDT daylight-saving transitions
+- Observation scoring under different weather and daylight conditions
+
+### Running Tests
+
+From the repository root:
+
+```powershell
+cd backend
+python -m pip install -r requirements-dev.txt
+python -m pytest -v
+```
+
+Tests use fixed observation times and mocked weather data to ensure repeatable results without depending on live weather API availability.
+
 ## API endpoints
 
 All calculation endpoints accept `lat` and `lon`. Time-dependent endpoints optionally accept an ISO datetime through `datetime_str`.
